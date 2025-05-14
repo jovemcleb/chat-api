@@ -26,7 +26,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   );
 
   // Listar usuários
-  fastify.get("/users", async (request: FastifyRequest) => {
+  fastify.get("/all", async (request: FastifyRequest) => {
     const users = await User.findAll({
       attributes: ["id", "username", "email"],
     });
