@@ -4,7 +4,7 @@ import User from "../models/user";
 
 export default async function userRoutes(fastify: FastifyInstance) {
   fastify.post(
-    "/register",
+    "/users/register",
     async (
       request: FastifyRequest<{
         Body: {
