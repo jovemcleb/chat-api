@@ -50,9 +50,9 @@ app.decorate(
 );
 
 // Registrar rotas
-app.register(import("./routes/auth"), { prefix: "/api" });
-app.register(import("./routes/users"), { prefix: "/api" });
-app.register(import("./routes/messages"), { prefix: "/api" });
+app.register(import("./routes/auth"), { prefix: "/api/auth" });
+app.register(import("./routes/users"), { prefix: "/api/users" });
+app.register(import("./routes/messages"), { prefix: "/api/messages" });
 
 // Relacionamentos
 User.hasMany(Message, { foreignKey: "senderId", as: "sentMessages" });

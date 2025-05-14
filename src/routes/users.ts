@@ -5,7 +5,7 @@ import User from "../models/user";
 export default async function userRoutes(fastify: FastifyInstance) {
   // Buscar usuário
   fastify.get(
-    "/users/search/",
+    "/search",
     async (
       request: FastifyRequest<{
         Querystring: { email?: string; username?: string };
@@ -33,7 +33,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   );
 
   // Listar usuários
-  fastify.get("/users", async (request: FastifyRequest) => {
+  fastify.get("/all", async (request: FastifyRequest) => {
     const users = await User.findAll({
       attributes: ["id", "username", "email"],
     });
