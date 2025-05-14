@@ -66,4 +66,40 @@ export default async function messageRoutes(fastify: FastifyInstance) {
       return messages;
     }
   );
+
+  // WebSocket para chat em tempo real
+  fastify.get("/messages/ws", { websocket: true }, (connection, req) => {
+  const socket = connection.socket;
+
+    // Adicionando tipo explícito para rawMessage
+    socket.on("message", async (rawMessage: Buffer) => {
+      try {
+        const message = rawMessage.toString();
+        const { senderId, receiverId, content } = JSON.parse(message) as {
+          senderId: number;
+          receiverId: number;
+          content: string;
+        };
+
+        // Salvar no banco de dados
+        const msg = await Message.create({ senderId, receiverId, content });
+        
+        // Enviar confirmação
+        socket.send(JSON.stringify({
+          status: "delivered",
+          message: msg
+        }));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        socket.send(JSON.stringify({
+          status: "error",
+          error: errorMessage
+        }));
+      }
+    });
+
+    socket.on("close", () => {
+      console.log("Connection closed");
+    });
+  });
 }

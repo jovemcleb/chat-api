@@ -4,12 +4,14 @@ import fastify, { FastifyInstance } from "fastify";
 import sequelize from "./db";
 import Message from "./models/message";
 import User from "./models/user";
+import fastifyWebsocket from "@fastify/websocket";
 
 const app: FastifyInstance = fastify({ logger: true });
 
 // Registrar plugins
 app.register(fastifyCors);
 app.register(fastifyHelmet);
+app.register(fastifyWebsocket);
 
 // Registrar rotas
 app.register(import("./routes/users"), { prefix: "/api" });
