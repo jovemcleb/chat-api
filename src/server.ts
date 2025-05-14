@@ -1,6 +1,8 @@
 import { app, initialize } from "./app";
+import { validateEnv } from "./utils/validateEnv";
 
 const start = async () => {
+  validateEnv();
   await initialize();
 
   try {
