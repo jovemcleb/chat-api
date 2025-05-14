@@ -1,18 +1,17 @@
 meta {
-  name: createUser
+  name: login
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
-  url: http://127.0.0.1:3000/api/register
+  url: http://localhost:3000/api/login
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "username": "Caleb Lima",
     "email": "caleb.lima@email.com",
     "password": "Caleb123456"
   }

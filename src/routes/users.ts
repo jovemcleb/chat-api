@@ -3,35 +3,6 @@ import { IUserPublic } from "../interfaces/userInterface";
 import User from "../models/user";
 
 export default async function userRoutes(fastify: FastifyInstance) {
-  fastify.post(
-    "/users/register",
-    async (
-      request: FastifyRequest<{
-        Body: {
-          username: string;
-          email: string;
-          password: string;
-        };
-      }>,
-      reply: FastifyReply
-    ) => {
-      try {
-        const { username, email, password } = request.body;
-        const user = await User.create({ username, email, password });
-
-        const response: IUserPublic = {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-        };
-
-        return response;
-      } catch (error: any) {
-        reply.code(400).send({ error: error.message });
-      }
-    }
-  );
-
   // Buscar usuário
   fastify.get(
     "/users/:id",

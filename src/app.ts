@@ -1,17 +1,56 @@
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
-import fastify, { FastifyInstance } from "fastify";
+import fastifyJwt from "@fastify/jwt";
+import dotenv from "dotenv";
+import fastify, {
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
+import path from "path";
 import sequelize from "./db";
 import Message from "./models/message";
 import User from "./models/user";
+
+dotenv.config({
+  path: path.resolve(__dirname, "../.env"),
+});
 
 const app: FastifyInstance = fastify({ logger: true });
 
 // Registrar plugins
 app.register(fastifyCors);
 app.register(fastifyHelmet);
+app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET!,
+  sign: {
+    expiresIn: "1d", // Token expira em 1 dia
+  },
+});
+
+// Adicione o tipo de usuário ao FastifyInstance
+declare module "fastify" {
+  interface FastifyInstance {
+    authenticate: (
+      request: FastifyRequest,
+      reply: FastifyReply
+    ) => Promise<void>;
+  }
+}
+
+app.decorate(
+  "authenticate",
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.send(err);
+    }
+  }
+);
 
 // Registrar rotas
+app.register(import("./routes/auth"), { prefix: "/api" });
 app.register(import("./routes/users"), { prefix: "/api" });
 app.register(import("./routes/messages"), { prefix: "/api" });
 
