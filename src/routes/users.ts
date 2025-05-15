@@ -5,7 +5,7 @@ import User from "../models/user";
 export default async function userRoutes(fastify: FastifyInstance) {
   // Buscar usuário
   fastify.get(
-    "/users/search/",
+    "/search",
     async (
       request: FastifyRequest<{
         Querystring: { email?: string; username?: string };
