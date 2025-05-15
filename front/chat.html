@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,9 +10,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 h-screen">
-    <div class="flex h-full">
+    <!-- Indicador de status de conexão -->
+    <div id="connectionStatus" class="connection-status hidden">
+        Conectando...
+    </div>
+
+    <!-- Layout para desktop -->
+    <div class="hidden md:flex h-full">
         <!-- Sidebar -->
-        <div class="w-1/4 bg-white border-r border-gray-200 flex flex-col">
+        <div class="w-1/4 lg:w-1/5 bg-white border-r border-gray-200 flex flex-col">
             <div class="p-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-semibold text-gray-800">Chat App</h2>
@@ -54,8 +61,8 @@
                     <button class="text-gray-500 hover:text-gray-700">
                         <i class="fas fa-video"></i>
                     </button>
-                    <button class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-ellipsis-v"></i>
+                    <button id="closeChat" class="text-gray-500 hover:text-gray-700" title="Fechar conversa">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
@@ -76,6 +83,46 @@
             </div>
         </div>
     </div>
-    <script src="app.js"></script>
+
+    <!-- Layout para mobile -->
+    <div class="flex flex-col h-full md:hidden">
+        <!-- Mobile Chat Header -->
+        <div class="bg-white p-3 border-b border-gray-200 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <button id="backButton" class="text-gray-500 hover:text-gray-700 p-1">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold" id="mobileContactInitial"></div>
+                <span class="font-medium" id="mobileContactName"></span>
+            </div>
+            <div class="flex space-x-3">
+                <button id="mobileCloseChat" class="text-gray-500 hover:text-gray-700 p-1" title="Fechar conversa">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Messages -->
+        <div class="flex-1 p-3 overflow-y-auto bg-gray-50" id="mobileMessagesContainer">
+            <!-- Mensagens para mobile serão carregadas aqui via JavaScript -->
+        </div>
+        
+        <!-- Mobile Message Input -->
+        <div class="p-3 border-t border-gray-200 bg-white">
+            <form id="mobileMessageForm" class="flex space-x-2">
+                <input type="text" id="mobileMessageInput" placeholder="Digite uma mensagem..." class="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                <button type="submit" class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/contacts.js"></script>
+    <script type="module" src="js/messages.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/utils.js"></script>
 </body>
 </html>
