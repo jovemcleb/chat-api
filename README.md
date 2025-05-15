@@ -38,23 +38,29 @@ Requisição de serviços!
 
 Certifique-se de que o **Node.js** esteja instalado na sua máquina.  
 
-**Passo 01** – Após realizar o download, abra o terminal da sua IDE e digite o seguinte comando:  `git clone <url-do-repositório>`
+**Passo 01** – Após realizar o download, abra o terminal da sua IDE e digite o seguinte comando:  `git clone https://github.com/jovemcleb/chat-app.git`
 
 **Passo 02** – Após realizar a clonagem na sua máquina local, entre na pasta:  `cd api`  
 e instale as dependências com:  `npm i`
 
-**Passo 03** – Em seguida, rode o seguinte comando para instalar o TypeScript globalmente:  `npm install -g typescript`
+**Passo 03** – Dentro da pasta `api`, crie um arquivo chamado `.env` e adicione o seguinte conteúdo:  `JWT_SECRET="oSistemaEhFalho"`
 
-**Passo 04** – Agora, compile o projeto com o comando:  `tsc`
+**Passo 04** – Em seguida, rode o seguinte comando para inicializar o servidor:  `npm run dev`
 
-**Passo 05** – Dentro da pasta `api`, crie um arquivo chamado `.env` e adicione o seguinte conteúdo:  `JWT_SECRET="oSistemaEhFalho"`
+**Passo 05** – instale a Extensão **Live Server** no vs code
 
-**Passo 06** – Para iniciar o servidor, execute:  `npm start`
+![alt text](image-1.png)
 
-**Passo 07** – Por fim, vá até a pasta `front` e abra o arquivo `index.html`.  
-Você pode utilizar a extensão **Live Server** ou abrir diretamente no navegador pelo link:  
-`http://127.0.0.1:5500/chat-app/front/index.html`
+**Passo 06** –Por fim, vá até a pasta `front` e clique com o botão direito em cima do arquivo `index.html`, depois Open with Live Server.  
 
+![alt text](image.png)
+
+Ele irá inicializar nesta url:  
+`http://127.0.0.1:5500/front/index.html`
+
+### Agora é só testar o projeto
+
+![alt text](image-2.png)
 ---
 
 ## 👨‍💻 Autores
