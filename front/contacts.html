@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Contatos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 h-screen">
+    <div class="flex h-full">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-800">Chat App</h2>
+                    <button id="logoutBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                <div class="mt-4 flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold" id="userInitial"></div>
+                    <span class="font-medium" id="usernameDisplay"></span>
+                </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="p-4 border-b border-gray-200">
+                <div class="relative">
+                    <input type="text" placeholder="Buscar contatos..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- Contacts List -->
+            <div class="flex-1 overflow-y-auto" id="contactsList">
+                <!-- Contatos serão carregados aqui via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <div class="flex items-center justify-center h-full bg-gray-50">
+                <div class="text-center p-6">
+                    <i class="fas fa-comments text-5xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-500">Selecione um contato para começar a conversar</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

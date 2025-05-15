@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Mensagens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 h-screen">
+    <div class="flex h-full">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-800">Chat App</h2>
+                    <button id="logoutBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                <div class="mt-4 flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold" id="userInitial"></div>
+                    <span class="font-medium" id="usernameDisplay"></span>
+                </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="p-4 border-b border-gray-200">
+                <div class="relative">
+                    <input type="text" placeholder="Buscar contatos..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <!-- Contacts List -->
+            <div class="flex-1 overflow-y-auto" id="contactsList">
+                <!-- Contatos serão carregados aqui via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Chat Header -->
+            <div class="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold" id="contactInitial"></div>
+                    <span class="font-medium" id="contactName"></span>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div class="flex-1 p-4 overflow-y-auto bg-gray-50" id="messagesContainer">
+                <!-- Mensagens serão carregadas aqui via JavaScript -->
+            </div>
+            
+            <!-- Message Input -->
+            <div class="p-4 border-t border-gray-200 bg-white">
+                <form id="messageForm" class="flex space-x-2">
+                    <input type="text" id="messageInput" placeholder="Digite uma mensagem..." class="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <button type="submit" class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
