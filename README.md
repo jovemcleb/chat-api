@@ -4,7 +4,7 @@ Projeto de comunicação em Sistemas Distribuidos!
 Aplicação Front End e Back End de comunicação de entre processos via Sockets utiliando API REST!
 Realização de simulação de um cenario real de troca de informações entre cliente e servidor!
 
-![Chat App](./chat-app.jpeg)
+<img src="./chat-app.jpeg"/>
 
 ## Requisitos do Sistemas
 
@@ -49,18 +49,18 @@ e instale as dependências com:  `npm i`
 
 **Passo 05** – instale a Extensão **Live Server** no vs code
 
-![alt text](./live-server.png)
+<img src="./live-server.png"/>
 
 **Passo 06** –Por fim, vá até a pasta `front` e clique com o botão direito em cima do arquivo `index.html`, depois Open with Live Server.  
 
-![alt text](./image.png)
+<img src="./image.png"/>
 
 Ele irá inicializar nesta url:  
 `http://127.0.0.1:5500/front/index.html`
 
 ### Agora é só testar o projeto
 
-![alt text](./teste-app.png)
+<img src="./teste-app.png"/>
 ---
 
 ## 👨‍💻 Autores
