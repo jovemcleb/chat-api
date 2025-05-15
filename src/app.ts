@@ -15,12 +15,14 @@ import User from "./models/user";
 dotenv.config({
   path: path.resolve(__dirname, "../.env"),
 });
+import fastifyWebsocket from "@fastify/websocket";
 
 const app: FastifyInstance = fastify({ logger: true });
 
 // Registrar plugins
 app.register(fastifyCors);
 app.register(fastifyHelmet);
+app.register(fastifyWebsocket);
 app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET!,
   sign: {
