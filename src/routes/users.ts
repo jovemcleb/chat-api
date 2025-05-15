@@ -32,6 +32,28 @@ export default async function userRoutes(fastify: FastifyInstance) {
     }
   );
 
+  // users.ts - adicione esta rota
+  fastify.get(
+      "/:id",
+      async (
+          request: FastifyRequest<{
+              Params: { id: string };
+          }>,
+          reply: FastifyReply
+      ) => {
+          const user = await User.findByPk(request.params.id, {
+              attributes: ["id", "username", "email"],
+          });
+
+          if (!user) {
+              reply.code(404).send({ error: "User not found" });
+              return;
+          }
+
+          return user as IUserPublic;
+      }
+  );
+
   // Listar usuários
   fastify.get("/all", async (request: FastifyRequest) => {
     const users = await User.findAll({
