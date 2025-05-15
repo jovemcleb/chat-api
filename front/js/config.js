@@ -1,5 +1,5 @@
 // Configurações globais
-export const API_BASE_URL = "http://localhost:3000/api";
+export const API_BASE_URL = "https://chat-app-9q1k.onrender.com/api";
 export const MAX_RECONNECT_ATTEMPTS = 5;
 
 // Estado global (usando objetos mutáveis para estados compartilhados)
@@ -8,5 +8,5 @@ export const appState = {
   currentContact: null,
   socket: null,
   reconnectAttempts: 0,
-  socketConnecting: false
+  socketConnecting: false,
 };
