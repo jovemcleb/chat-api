@@ -1,6 +1,7 @@
 import fastifyCors from "@fastify/cors";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyJwt from "@fastify/jwt";
+import fastifyWebsocket from "@fastify/websocket";
 import dotenv from "dotenv";
 import fastify, {
   FastifyInstance,
@@ -15,14 +16,18 @@ import User from "./models/user";
 dotenv.config({
   path: path.resolve(__dirname, "../.env"),
 });
-import fastifyWebsocket from "@fastify/websocket";
 
 const app: FastifyInstance = fastify({ logger: true });
+app.decorate("websocketConnections", new Map<number, WebSocket>());
 
 // Registrar plugins
-app.register(fastifyCors);
-app.register(fastifyHelmet);
 app.register(fastifyWebsocket);
+app.register(fastifyCors, {
+  origin: true, // Ou especifique seu frontend (ex: "http://localhost:5500")
+  credentials: true,
+  allowedHeaders: ["Sec-WebSocket-Protocol", "Content-Type", "Authorization"],
+});
+app.register(fastifyHelmet);
 app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET!,
   sign: {
