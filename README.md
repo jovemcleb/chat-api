@@ -49,18 +49,18 @@ e instale as dependências com:  `npm i`
 
 **Passo 05** – instale a Extensão **Live Server** no vs code
 
-![alt text](image-1.png)
+![alt text](./live-server.png)
 
 **Passo 06** –Por fim, vá até a pasta `front` e clique com o botão direito em cima do arquivo `index.html`, depois Open with Live Server.  
 
-![alt text](image.png)
+![alt text](./image.png)
 
 Ele irá inicializar nesta url:  
 `http://127.0.0.1:5500/front/index.html`
 
 ### Agora é só testar o projeto
 
-![alt text](image-2.png)
+![alt text](./teste-app.png)
 ---
 
 ## 👨‍💻 Autores
