@@ -9,6 +9,7 @@ import fastify, {
   FastifyRequest,
 } from "fastify";
 import path from "path";
+import { WebSocket } from "ws";
 import sequelize from "./db";
 import Message from "./models/message";
 import User from "./models/user";
@@ -18,7 +19,7 @@ dotenv.config({
 });
 
 const app: FastifyInstance = fastify({ logger: true });
-app.decorate("websocketConnections", new Map<number, WebSocket>());
+app.decorate("activeConnections", new Map<number, WebSocket>());
 
 // Registrar plugins
 app.register(fastifyWebsocket);

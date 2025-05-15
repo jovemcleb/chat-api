@@ -7,6 +7,7 @@ let currentContact = null;
 let socket = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
+let socketConnecting = false; // Controle para evitar conexões simultâneas
 
 // DOM Content Loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -297,6 +298,7 @@ function cleanupWebSocket() {
   }
   currentContact = null;
   reconnectAttempts = 0;
+  socketConnecting = false;
 }
 
 // Adicionar listeners para navegação
@@ -346,13 +348,14 @@ async function openChat(contact) {
     // Verificar se já temos uma conexão válida
     if (socket && socket.readyState === WebSocket.OPEN) {
       console.log("Usando conexão WebSocket existente");
+      // Carregar mensagens usando a conexão existente
+      loadMessages();
     } else {
       // Estabelecer nova conexão
       await connectWebSocket();
+      // Carregar mensagens após a conexão ser estabelecida
+      loadMessages();
     }
-
-    // Carregar mensagens após conexão estabelecida
-    loadMessages();
   } catch (error) {
     console.error("Erro ao inicializar chat:", error);
 
@@ -484,33 +487,247 @@ function renderMessages(messages) {
 }
 
 async function connectWebSocket() {
+  // Evitar conexões simultâneas
+  if (socketConnecting) {
+    console.log("Conexão em andamento, aguardando...");
+    return new Promise((resolve, reject) => {
+      // Tentar verificar se conseguimos uma conexão a cada 100ms
+      const checkInterval = setInterval(() => {
+        if (!socketConnecting) {
+          clearInterval(checkInterval);
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            resolve(socket);
+          } else {
+            reject(new Error("Conexão falhou"));
+          }
+        }
+      }, 100);
+
+      // Desistir após 5 segundos
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        reject(new Error("Tempo de espera esgotado"));
+      }, 5000);
+    });
+  }
+
+  socketConnecting = true;
+
   return new Promise((resolve, reject) => {
-    const socket = new WebSocket("ws://localhost:3000/api/messages/ws");
+    const token = localStorage.getItem("chatToken");
+    if (!token) {
+      socketConnecting = false;
+      reject(new Error("No authentication token found"));
+      return;
+    }
 
-    socket.onopen = () => {
-      console.log("Conectado ao WebSocket!");
-      resolve(socket);
-
-      // Enviar mensagem inicial
-      socket.send("Olá servidor!");
-    };
-
-    socket.onmessage = (event) => {
-      console.log("Resposta do servidor:", event.data);
-    };
-
-    socket.onclose = (event) => {
-      console.log(`Conexão fechada (código ${event.code})`);
-      if (event.code !== 1000) {
-        reject(new Error(`Conexão fechada inesperadamente: ${event.reason}`));
+    try {
+      // Fechar qualquer conexão existente antes de criar uma nova
+      if (socket && socket.readyState !== WebSocket.CLOSED) {
+        socket.close();
       }
-    };
 
-    socket.onerror = (error) => {
-      console.error("Erro WebSocket:", error);
+      // Debug - Mostrar qual URL está sendo usada
+      const wsUrl = `ws://localhost:3000/api/messages/ws?token=${encodeURIComponent(
+        token
+      )}`;
+      console.log("Conectando ao WebSocket:", wsUrl);
+
+      // Adicione o token como query parameter
+      const newSocket = new WebSocket(wsUrl);
+
+      // Definir timeout para conexão
+      const connectionTimeout = setTimeout(() => {
+        if (newSocket.readyState !== WebSocket.OPEN) {
+          console.error("WebSocket connection timeout");
+          newSocket.close();
+          socketConnecting = false;
+          reject(new Error("Connection timeout"));
+        }
+      }, 10000); // Aumentar timeout para 10 segundos
+
+      newSocket.onopen = () => {
+        console.log("Conectado ao WebSocket!");
+        clearTimeout(connectionTimeout);
+
+        // Verificar se a conexão está estável com um ping inicial
+        newSocket.send(JSON.stringify({ type: "ping" }));
+
+        // Armazenar globalmente somente após conexão bem-sucedida
+        socket = newSocket;
+        reconnectAttempts = 0;
+        socketConnecting = false;
+        resolve(socket);
+      };
+
+      // Configurar handlers de mensagem
+      newSocket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          console.log("Mensagem recebida:", message.type);
+
+          switch (message.type) {
+            case "chat":
+              addMessageToChat(message);
+              break;
+
+            case "delivery_status":
+              updateMessageStatus(message.messageId, message.status);
+              break;
+
+            case "system":
+              console.log("Sistema:", message.content);
+              break;
+
+            case "pong":
+              console.log("Pong recebido do servidor");
+              break;
+
+            case "error":
+              console.error("Erro do servidor:", message.content);
+              // Mostrar mensagem de erro ao usuário se necessário
+              break;
+
+            default:
+              console.log("Mensagem desconhecida:", message);
+          }
+        } catch (error) {
+          console.error("Erro ao processar mensagem WebSocket:", error);
+        }
+      };
+
+      newSocket.onclose = (event) => {
+        console.log(`Conexão fechada (código ${event.code}): ${event.reason}`);
+        socketConnecting = false;
+
+        // Se não foi um fechamento "limpo" (code 1000), tentar reconectar
+        if (event.code !== 1000) {
+          handleReconnect();
+        }
+      };
+
+      newSocket.onerror = (error) => {
+        console.error("Erro WebSocket:", error);
+        clearTimeout(connectionTimeout);
+        socketConnecting = false;
+        reject(error);
+      };
+    } catch (error) {
+      console.error("Erro ao inicializar WebSocket:", error);
+      socketConnecting = false;
       reject(error);
-    };
+    }
   });
+}
+
+// Implementar heartbeat para detectar desconexões silenciosas
+function setupHeartbeat() {
+  if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+  // Enviar ping a cada 30 segundos
+  const pingInterval = setInterval(() => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      try {
+        socket.send(JSON.stringify({ type: "ping" }));
+      } catch (error) {
+        console.error("Erro ao enviar ping:", error);
+        clearInterval(pingInterval);
+
+        // Se não conseguimos enviar ping, a conexão provavelmente está quebrada
+        if (socket) {
+          socket.close();
+          // handleReconnect será chamado pelo evento onclose
+        }
+      }
+    } else {
+      clearInterval(pingInterval);
+    }
+  }, 30000);
+
+  // Limpar intervalo quando o socket for fechado
+  socket.addEventListener("close", () => {
+    clearInterval(pingInterval);
+  });
+}
+
+// Função para lidar com reconexão do WebSocket
+function handleReconnect() {
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    console.error("Número máximo de tentativas de reconexão atingido");
+
+    // Mostrar mensagem de erro para o usuário
+    const messagesContainer = document.getElementById("messagesContainer");
+    if (messagesContainer) {
+      messagesContainer.innerHTML += `
+        <div class="flex justify-center my-4">
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+            Não foi possível reconectar ao servidor. Por favor, atualize a página.
+          </div>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  reconnectAttempts++;
+
+  // Tempo de espera exponencial com jitter para evitar reconexões simultâneas
+  const backoff = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+  const jitter = Math.random() * 1000;
+  const timeout = backoff + jitter;
+
+  console.log(
+    `Tentando reconectar em ${Math.round(timeout / 1000)} segundos...`
+  );
+
+  // Mostrar indicador de reconexão
+  const messagesContainer = document.getElementById("messagesContainer");
+  if (messagesContainer) {
+    // Remover indicador anterior se existir
+    document.getElementById("reconnect-indicator")?.remove();
+
+    messagesContainer.innerHTML += `
+      <div class="flex justify-center my-2" id="reconnect-indicator">
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded flex items-center">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-700 mr-2"></div>
+          Reconectando... Tentativa ${reconnectAttempts} de ${MAX_RECONNECT_ATTEMPTS}
+        </div>
+      </div>
+    `;
+  }
+
+  setTimeout(() => {
+    // Remover indicador de reconexão anterior
+    document.getElementById("reconnect-indicator")?.remove();
+
+    // Só tentar reconectar se ainda estivermos na página de chat
+    if (window.location.pathname.endsWith("chat.html")) {
+      connectWebSocket()
+        .then(() => {
+          console.log("Reconectado com sucesso!");
+
+          // Configurar heartbeat para a nova conexão
+          setupHeartbeat();
+
+          // Se estiver na página de chat, recarregar mensagens
+          if (currentContact) {
+            loadMessages();
+          }
+        })
+        .catch((error) => {
+          console.error("Falha na reconexão:", error);
+          // Tentar novamente
+          handleReconnect();
+        });
+    }
+  }, timeout);
+}
+
+// Função para atualizar o status de uma mensagem na interface
+function updateMessageStatus(messageId, status) {
+  // Implementar conforme necessário para atualizar indicadores visuais
+  // Por exemplo, você pode adicionar ícones de check para mensagens entregues/lidas
+  console.log(`Mensagem ${messageId} atualizada para: ${status}`);
 }
 
 // Função para enviar mensagem
@@ -562,6 +779,7 @@ function sendMessageToSocket(content) {
     };
 
     socket.send(JSON.stringify(message));
+    console.log("Mensagem enviada:", message);
 
     // Pré-visualização da mensagem enviada
     const messagesContainer = document.getElementById("messagesContainer");
